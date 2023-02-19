@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mushan.im.dao.MessageDao">
+
+
+    <select id="list" resultType="Map">
+        SELECT a.* FROM (
+				SELECT a.*,b.image from message as `a`
+				LEFT JOIN `user` as `b`
+				ON a.`from` = b.id
+WHERE `from` = #{from} and `to` = #{to}
+
+UNION
+			SELECT a.*,b.image from message as `a`
+				LEFT JOIN `user` as `b`
+				ON a.`from` = b.id
+WHERE `from` = #{to} and `to` = #{from}) as `a`
+ORDER BY a.time asc
+    </select>
+
+
+    <insert id="add" parameterType="com.mushan.im.pojo.Message">
+        insert into message(`from`,`to`,`type`,content,`time`)
+          values(#{from},#{to},#{type},#{content},#{time})
+    </insert>
+</mapper>

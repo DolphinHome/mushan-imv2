@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mushan.im.dao.FriendDao">
+
+
+    <select id="list" resultType="com.mushan.im.pojo.User">
+      select b.image,b.id,b.username from
+friend  as `a`
+JOIN user as `b`
+ON a.fid = b.id
+where a.uid = #{id}
+    </select>
+
+    <insert id="add" parameterType="com.mushan.im.pojo.Friend">
+insert into friend(uid,fid)
+values(#{uid},#{fid})
+</insert>
+
+</mapper>

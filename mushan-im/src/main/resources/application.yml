@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    driver-calss-name: com.mysql.cj.jdbc.Drive
+    url: jdbc:mysql://124.70.23.222:3306/im?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    hikari:
+      pool-name: DateHikariC
+      minimux-idle: 5
+      idel-timeout: 18000
+      maximum-pool-size: 10
+      auto-commit: true
+      max-lifetime: 1800000
+      connection-timeout: 30000
+      connection-test-query: SELECT 1
+jwt:
+  tokenHeader: Authorization
+  secret: eiorjeowijfioewjfdksjfoisd
+  expiration: 1800000
+  tokenHead: Bearer
+#  mybatis ≈‰÷√
+mybatis:
+  mapper-locations: classpath*:mapper/*.xml

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="./css/index.css" />
+		<script src="./js/jq.js" type="text/javascript" charset="utf-8"></script>
+		<!-- uni 的 SDK -->
+		<script type="text/javascript" src="https://js.cdn.aliyun.dcloud.net.cn/dev/uni-app/uni.webview.1.5.2.js">
+		</script>
+		<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+	</head>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+		}
+
+		#v1 {
+			position: absolute;
+			right: 0;
+			top: 20;
+			z-index: 100;
+		}
+
+		#v2 {
+			position: absolute;
+			right: 0;
+			top: 0;
+			left: 0;
+			bottom: 0;
+			z-index: 1;
+		}
+	</style>
+
+	<body>
+		<video id="v1" loop preload></video>
+		<video id="v2" loop preload></video>
+
+	</body>
+	<script>
+		let type = GetQueryString('type');
+		let tid = GetQueryString('from');
+		let uid = GetQueryString('uid');
+		let videoWidth = GetQueryString('wid')
+		let videoHeight = GetQueryString('hei')
+		//获取url
+		let mystrea = null;
+		let ws = null;
+		var v2 = null;
+		let pc = null;
+
+
+		start()
+
+		function start() {
+			ws = new WebSocket("ws://192.168.1.12:8004/ws");
+			setTimeout(() => {
+				ws.send(JSON.stringify({
+					"uid": uid,
+					"type": 1
+				}))
+				if (type == 1) {
+					ws.send(JSON.stringify({
+						"uid": uid,
+						"to": tid,
+						type: 3
+					}))
+				} else {
+					ws.send(JSON.stringify({
+						"uid": uid,
+						"to": tid,
+						type: 4
+					}))
+				}
+
+			}, 1000);
+			ws.onmessage = getmessage;
+			//v2的样式
+			v2 = document.querySelector("#v2");
+			v2.width = videoWidth
+			v2.height = videoHeight
+			initVideo()
+
+		}
+
+		function getmessage(message) {
+			let data = JSON.parse(message.data)
+
+			switch (data.type) {
+				case 4:
+					ws.send(JSON.stringify({
+						"uid": uid,
+						"to": tid,
+						"type": 5
+					}))
+
+					break;
+				case 5:
+
+					if (pc == null) {
+						createPeerConnection();
+					}
+					pc.createOffer(createOfferAndSendMessage, handleCreateOfferError)
+					break;
+				case 6:
+
+					if (pc == null) {
+						createPeerConnection()
+					}
+
+					pc.setRemoteDescription(new RTCSessionDescription(data.message));
+					doAnswer()
+					break;
+				case 7:
+				
+					pc.setRemoteDescription(new RTCSessionDescription(data.message));
+					break;
+				case 8:
+
+					var candidate = new RTCIceCandidate({
+						sdpMLineIndex: data.message.sdpMLineIndex,
+						candidate: data.message.candidate
+					});
+					pc.addIceCandidate(candidate)
+					break;
+			}
+
+		}
+
+		function doAnswer() {
+			if (pc == null) {
+				createPeerConnection()
+			}
+
+			pc.createAnswer().then(createAnswerAndSendMessage, handleCreateAnswerError);
+		}
+
+		function handleCreateAnswerError() {
+
+		}
+
+		function createAnswerAndSendMessage(sessionDescription) {
+
+			pc.setLocalDescription(sessionDescription)
+			ws.send(JSON.stringify({
+				"uid": uid,
+				"to": tid,
+				"type": 7,
+				"message": sessionDescription
+			}))
+		}
+
+		function createOfferAndSendMessage(sessionDescription) {
+			pc.setLocalDescription(sessionDescription)
+			ws.send(JSON.stringify({
+				"uid": uid,
+				"to": tid,
+				"type": 6,
+				"message": sessionDescription
+			}))
+		}
+
+		function handleCreateOfferError() {
+			console.log("aa")
+		}
+
+		function initVideo() {
+			let that = this;
+			this.video = document.getElementById("v1");
+
+
+			setTimeout(() => {
+				if (
+					navigator.mediaDevices.getUserMedia ||
+					navigator.getUserMedia ||
+					navigator.webkitGetUserMedia ||
+					navigator.mozGetUserMedia
+				) {
+					//调用用户媒体设备, 访问摄像头
+					this.getUserMedia({
+							video: {
+								width: {
+									ideal: 220,
+									max: 220
+								},
+								height: {
+									ideal: 140,
+									max: 140
+								},
+								facingMode: 'user', //前置摄像头
+								// facingMode: { exact: "environment" }, //后置摄像头
+								frameRate: {
+									ideal: 30,
+									min: 10
+								}
+							},
+							audio: {
+								noiseSuppression: true,
+								echoCancellation: true
+							}
+						},
+						this.videoSuccess,
+						this.videoError
+					);
+				} else {}
+			}, 300);
+		}
+
+
+		function createPeerConnection() {
+
+			pc = new RTCPeerConnection(null);
+			pc.onicecandidate = handleIceCandidate;
+			pc.onaddstream = handleRemoteStreamAdded;
+			for (const trac of this.mystrea.getTracks()) {
+				pc.addTrack(trac, this.mystrea);
+			}
+
+		}
+
+		const handleIceCandidate = (event) => {
+			if (event.candidate) {
+				ws.send(JSON.stringify({
+					"uid": uid,
+					"to": tid,
+					"type": 8,
+					"message": event.candidate
+				}))
+			}
+		}
+
+		const handleRemoteStreamAdded = (event) => {
+		
+			v2.srcObject = event.stream;
+			v2.play()
+		}
+
+
+		// 获取用户设备
+		function getUserMedia(constraints, success, error) {
+			if (navigator.mediaDevices.getUserMedia) {
+				//最新的标准API
+				navigator.mediaDevices
+					.getUserMedia(constraints)
+					.then(success)
+					.catch(error);
+			} else if (navigator.webkitGetUserMedia) {
+				//webkit核心浏览器
+				navigator.webkitGetUserMedia(constraints, success, error);
+			} else if (navigator.mozGetUserMedia) {
+				//firfox浏览器
+				navigator.mozGetUserMedia(constraints, success, error);
+			} else if (navigator.getUserMedia) {
+				//旧版API
+				navigator.getUserMedia(constraints, success, error);
+			}
+		}
+
+		// 开始有画面
+		function videoSuccess(stream) {
+			this.mystrea = stream;
+			this.video.srcObject = stream;
+			this.video.play();
+		}
+
+		function videoError(error) {
+			console.log('摄像头获取错误')
+			alert('摄像头获取错误')
+		}
+
+
+		function GetQueryString(name) {
+			var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+			var r = window.location.search.substr(1).match(reg); //获取url中"?"符后的字符串并正则匹配
+			var context = "";
+			if (r != null)
+				context = decodeURIComponent(r[2]);
+			reg = null;
+			r = null;
+			return context == null || context == "" || context == "undefined" ? "" : context;
+		}
+	</script>
+
+
+</html>

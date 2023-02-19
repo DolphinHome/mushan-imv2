@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mushan.im.dao.ApplyDao">
+
+    <insert id="add" parameterType="com.mushan.im.pojo.Apply">
+insert into apply(uid,tid)
+values(#{uid},#{tid})
+</insert>
+    <select id="getFriends" resultType="com.mushan.im.pojo.User">
+        SELECT b.* FROM apply as `a`
+LEFT JOIN `user` as `b`
+on a.uid = b.id
+WHERE a.tid = #{id}
+    </select>
+
+</mapper>
