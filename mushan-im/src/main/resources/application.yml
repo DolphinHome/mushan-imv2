@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-calss-name: com.mysql.cj.jdbc.Drive
-    url: jdbc:mysql://124.70.23.222:3306/im?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://127.0.0.1:3306/im?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
     username: root
     password: 123456
     hikari:
@@ -18,6 +18,6 @@ jwt:
   secret: eiorjeowijfioewjfdksjfoisd
   expiration: 1800000
   tokenHead: Bearer
-#  mybatis ≈‰÷√
+#  mybatis 
 mybatis:
   mapper-locations: classpath*:mapper/*.xml
