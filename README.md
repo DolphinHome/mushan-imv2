@@ -14,4 +14,4 @@ mushan
 
 b站地址:
 
-https://gitee.com/kiyama/mushan-imv2/blob/master/img/%5DBM@$%7D%7BVFCOOC_011%7BHET_F.png
+![Image text]https://gitee.com/kiyama/mushan-imv2/blob/master/img/%5DBM@$%7D%7BVFCOOC_011%7BHET_F.png
