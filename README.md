@@ -13,4 +13,5 @@ mushan
 目前只支持局域网  如果视频通话需要在外网的话 可以自己搭建turn服务器。
 
 b站地址:
-截图
+
+https://gitee.com/kiyama/mushan-imv2/blob/master/img/%5DBM@$%7D%7BVFCOOC_011%7BHET_F.png
