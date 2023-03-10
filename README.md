@@ -12,7 +12,7 @@ mushan
 此项目主要是用作学习 可能会有一些问题  可以通过邮件跟我反馈，app端需要有相机和录音的权限不然视频通话功能无法使用。
 目前只支持局域网  如果视频通话需要在外网的话 可以自己搭建turn服务器。
 ## b站地址
-b站地址:
+b站地址:https://www.bilibili.com/video/BV12v4y1j7dW/?spm_id_from=333.1007.top_right_bar_window_default_collection.content.click&vd_source=c6700092758092817e6a6463360a3597
 ## 演示效果
 ![Image text](img/%5DBM@$%7D%7BVFCOOC_011%7BHET_F.png)
 ![输入图片说明](img/9(%25Z%5D8$%5D%5D)9I4$IFZIM8%5B45.png)
